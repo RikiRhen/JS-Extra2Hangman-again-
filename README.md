@@ -17,6 +17,9 @@ It works by changing the opacity of the `<ellipse>` element and the different `<
 - It must be built with vanilla JavaScript.
 - No usage of CSS frameworks or SCSS.
 
+-> ADDED RESTRICTIONS BY MYSELF <-
+- Everything must be done from the .js file only.
+
 ### Requirements
 
 - The secret word must be displayed in a way that makes it clear on how many letters that exist in the secret word.

@@ -1,10 +1,13 @@
-const secretWordList = [
+/*const secretWordList = [
     `VARIABLE`,
     `CONSTANT`,
     `CONTAINER`,
     `CATASTROPHY`,
     `TEST`,
     `STRATAGEM`
+];*/
+const secretWordList = [
+    `TEST`
 ];
 
 //Event listener to make sure the DOM content is properly loaded before starting to manipulate it.
@@ -41,14 +44,20 @@ document.addEventListener(`DOMContentLoaded`, () => {
     hangman.setAttribute(`data`, `hangman.svg`);
     selector.insertAdjacentElement(`afterBegin`, hangman);
 
+    //Guess form
+    const form = document.createElement(`form`);
+    form.autocomplete = `off`;
+
     //Guess input
     const guess = document.createElement(`input`);
+    guess.id = `guess-input`;
     guess.classList.add(`guess-input`);
     guess.placeholder = "Make a guess";
 
     //Submit button
     const submit = document.createElement(`button`);
     submit.innerText = `Guess`;
+    submit.type = `submit`;
     submit.classList.add(`submit`)
     submit.style.maxWidth = `fit-content`;
 
@@ -59,7 +68,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
     headline.classList.add(`headline`);
 
     //Secret word
-    const word = document.createElement(`h2`);
+    let word = document.createElement(`h2`);
     word.style.fontFamily = `Verdana`;
     word.style.letterSpacing = `15px`;
     word.innerText = secretWordList[Math.floor(Math.random() * secretWordList.length)]
@@ -74,25 +83,76 @@ document.addEventListener(`DOMContentLoaded`, () => {
     selector.style.flexDirection = `column`;
 
     //Add elements to guess-container;
-    inputContainer.insertAdjacentElement(`afterBegin`, submit);
-    inputContainer.insertAdjacentElement(`afterBegin`, guess);
+    inputContainer.insertAdjacentElement(`afterBegin`, form);
+    form.insertAdjacentElement(`afterBegin`, submit);
+    form.insertAdjacentElement(`afterBegin`, guess);
     headlineContainer.insertAdjacentElement(`afterBegin`, headline);
     wordContainer.insertAdjacentElement(`afterBegin`, word);
+
+    const secretWord = word.innerText;
+    const anonymizedWord = anonymize(word.innerText);
+    word.innerText = anonymizedWord;
 
 
     //Event listener to make sure that the SVG object is properly loaded before attempting to manipulate it.
     hangman.addEventListener('load', () => {
         const svgObj = document.querySelector(`#hangman-svg`);
         const svg = svgObj.contentDocument;
+        let triesLeft = 6;
 
-        /*
-        svg.querySelector(`#scaffold`).style.opacity = 0;
-        svg.querySelector(`#head`).style.opacity = 0;
-        svg.querySelector(`#body`).style.opacity = 0;
-        svg.querySelector(`#arms`).style.opacity = 0;
-        svg.querySelector(`#legs`).style.opacity = 0;
-        svg.querySelector(`#ground`).style.opacity = 0;
-        */
+        if (triesLeft === 5) {
+            svg.querySelector(`#scaffold`).style.opacity = 1;
+            svg.querySelector(`#head`).style.opacity = 0;
+            svg.querySelector(`#body`).style.opacity = 0;
+            svg.querySelector(`#arms`).style.opacity = 0;
+            svg.querySelector(`#legs`).style.opacity = 0;
+            svg.querySelector(`#ground`).style.opacity = 0;
+        } else if (triesLeft === 4) {
+            svg.querySelector(`#head`).style.opacity = 1;
+            svg.querySelector(`#body`).style.opacity = 0;
+            svg.querySelector(`#arms`).style.opacity = 0;
+            svg.querySelector(`#legs`).style.opacity = 0;
+            svg.querySelector(`#ground`).style.opacity = 0;
+        } else if (triesLeft === 3) {
+            svg.querySelector(`#body`).style.opacity = 1;
+            svg.querySelector(`#arms`).style.opacity = 0;
+            svg.querySelector(`#legs`).style.opacity = 0;
+            svg.querySelector(`#ground`).style.opacity = 0;
+        } else if (triesLeft === 2) {
+            svg.querySelector(`#arms`).style.opacity = 1;
+            svg.querySelector(`#legs`).style.opacity = 0;
+            svg.querySelector(`#ground`).style.opacity = 0;
+        } else if (triesLeft === 1) {
+            svg.querySelector(`#legs`).style.opacity = 1;
+            svg.querySelector(`#ground`).style.opacity = 0;
+        } else {
+            svg.querySelector(`#ground`).style.opacity = 1;
+        }
+
+        document.addEventListener(`submit`, (event) => {
+            event.preventDefault();
+
+            let guessedLetter = document.querySelector(`#guess-input`).value.toUpperCase();
+
+            //Correctly guessed letter
+            if (secretWord.includes(guessedLetter)) {
+                const indexes = findEachIndex(secretWord, guessedLetter);
+                let finalWord = word.innerText.split('');
+
+                indexes.forEach(index => {
+                    finalWord[index] = guessedLetter;
+                });
+
+                word.innerText = finalWord.join(``);
+            }
+            //Incorrectly guessed letter
+            else {
+
+            }
+
+            console.log(guessedLetter);
+            form.reset();
+        })
 
 
     });
@@ -105,14 +165,15 @@ document.addEventListener(`DOMContentLoaded`, () => {
         return result;
     }
 
-    const anonymizedWord = anonymize(word.innerText);
-    word.innerText = anonymizedWord;
+    function findEachIndex(string, letter) {
+        let result = [];
+        for (let i = 0; i < string.length; i++) {
+            if (string[i] === letter) {
+                result.push(i);
+            }
+        }
+        return result;
+    }
 
-
-
-
-
-
-    console.log(selector);
 })
 
