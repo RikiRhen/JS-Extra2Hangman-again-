@@ -96,38 +96,17 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
     //Event listener to make sure that the SVG object is properly loaded before attempting to manipulate it.
     hangman.addEventListener('load', () => {
+        let triesLeft = 6;
         const svgObj = document.querySelector(`#hangman-svg`);
         const svg = svgObj.contentDocument;
-        let triesLeft = 6;
 
-        if (triesLeft === 5) {
-            svg.querySelector(`#scaffold`).style.opacity = 1;
-            svg.querySelector(`#head`).style.opacity = 0;
-            svg.querySelector(`#body`).style.opacity = 0;
-            svg.querySelector(`#arms`).style.opacity = 0;
-            svg.querySelector(`#legs`).style.opacity = 0;
-            svg.querySelector(`#ground`).style.opacity = 0;
-        } else if (triesLeft === 4) {
-            svg.querySelector(`#head`).style.opacity = 1;
-            svg.querySelector(`#body`).style.opacity = 0;
-            svg.querySelector(`#arms`).style.opacity = 0;
-            svg.querySelector(`#legs`).style.opacity = 0;
-            svg.querySelector(`#ground`).style.opacity = 0;
-        } else if (triesLeft === 3) {
-            svg.querySelector(`#body`).style.opacity = 1;
-            svg.querySelector(`#arms`).style.opacity = 0;
-            svg.querySelector(`#legs`).style.opacity = 0;
-            svg.querySelector(`#ground`).style.opacity = 0;
-        } else if (triesLeft === 2) {
-            svg.querySelector(`#arms`).style.opacity = 1;
-            svg.querySelector(`#legs`).style.opacity = 0;
-            svg.querySelector(`#ground`).style.opacity = 0;
-        } else if (triesLeft === 1) {
-            svg.querySelector(`#legs`).style.opacity = 1;
-            svg.querySelector(`#ground`).style.opacity = 0;
-        } else {
-            svg.querySelector(`#ground`).style.opacity = 1;
-        }
+        svg.querySelector(`#scaffold`).style.opacity = 0;
+        svg.querySelector(`#head`).style.opacity = 0;
+        svg.querySelector(`#body`).style.opacity = 0;
+        svg.querySelector(`#arms`).style.opacity = 0;
+        svg.querySelector(`#legs`).style.opacity = 0;
+        svg.querySelector(`#ground`).style.opacity = 0;
+
 
         document.addEventListener(`submit`, (event) => {
             event.preventDefault();
@@ -146,8 +125,10 @@ document.addEventListener(`DOMContentLoaded`, () => {
                 word.innerText = finalWord.join(``);
             }
             //Incorrectly guessed letter
-            else {
-
+            else if (!secretWord.includes(guessedLetter)) {
+                triesLeft--;
+                console.log(triesLeft);
+                updateHangman(triesLeft);
             }
 
             console.log(guessedLetter);
@@ -173,6 +154,57 @@ document.addEventListener(`DOMContentLoaded`, () => {
             }
         }
         return result;
+    }
+
+    function updateHangman(triesLeft) {
+        const svgObj = document.querySelector(`#hangman-svg`);
+        const svg = svgObj.contentDocument;
+
+        switch (triesLeft) {
+            case 6:
+                svg.querySelector(`#scaffold`).style.opacity = 0;
+                svg.querySelector(`#head`).style.opacity = 0;
+                svg.querySelector(`#body`).style.opacity = 0;
+                svg.querySelector(`#arms`).style.opacity = 0;
+                svg.querySelector(`#legs`).style.opacity = 0;
+                svg.querySelector(`#ground`).style.opacity = 0;
+                break;
+            case 5:
+                svg.querySelector(`#scaffold`).style.opacity = 1;
+                svg.querySelector(`#head`).style.opacity = 0;
+                svg.querySelector(`#body`).style.opacity = 0;
+                svg.querySelector(`#arms`).style.opacity = 0;
+                svg.querySelector(`#legs`).style.opacity = 0;
+                svg.querySelector(`#ground`).style.opacity = 0;
+                break;
+            case 4:
+                svg.querySelector(`#head`).style.opacity = 1;
+                svg.querySelector(`#body`).style.opacity = 0;
+                svg.querySelector(`#arms`).style.opacity = 0;
+                svg.querySelector(`#legs`).style.opacity = 0;
+                svg.querySelector(`#ground`).style.opacity = 0;
+                break;
+            case 3:
+                svg.querySelector(`#body`).style.opacity = 1;
+                svg.querySelector(`#arms`).style.opacity = 0;
+                svg.querySelector(`#legs`).style.opacity = 0;
+                svg.querySelector(`#ground`).style.opacity = 0;
+                break;
+            case 2:
+                svg.querySelector(`#arms`).style.opacity = 1;
+                svg.querySelector(`#legs`).style.opacity = 0;
+                svg.querySelector(`#ground`).style.opacity = 0;
+                break;
+            case 1:
+                svg.querySelector(`#legs`).style.opacity = 1;
+                svg.querySelector(`#ground`).style.opacity = 0;
+                break;
+            case 0:
+                svg.querySelector(`#ground`).style.opacity = 1;
+                break;
+            default:
+                break;
+        }
     }
 
 })
