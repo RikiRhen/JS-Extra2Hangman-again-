@@ -1,14 +1,16 @@
-/*const secretWordList = [
+const secretWordList = [
     `VARIABLE`,
     `CONSTANT`,
     `CONTAINER`,
     `CATASTROPHY`,
     `TEST`,
     `STRATAGEM`
-];*/
+];
+/*
 const secretWordList = [
     `TEST`
 ];
+*/
 
 //Event listener to make sure the DOM content is properly loaded before starting to manipulate it.
 document.addEventListener(`DOMContentLoaded`, () => {
@@ -19,21 +21,24 @@ document.addEventListener(`DOMContentLoaded`, () => {
     selector.style.justifyContent = `space-evenly`;
 
     //Divs
-    const guessContainer = document.createElement(`div`)
+    const guessContainer = document.createElement(`div`);
     guessContainer.id = `guess-container`;
-    const inputContainer = document.createElement(`div`)
+    const inputContainer = document.createElement(`div`);
     inputContainer.id = `input-container`;
-    const headlineContainer = document.createElement(`div`)
+    const headlineContainer = document.createElement(`div`);
     headlineContainer.id = `headline-container`;
+    const guessedLetterContainer = document.createElement(`div`);
+    guessedLetterContainer.id = `guessed-letter-container`;
     const hangmanContainer = document.createElement(`div`);
     hangmanContainer.id = `hangman-container`;
     const wordContainer = document.createElement(`div`);
     wordContainer.id = `word-container`;
 
-    selector.insertAdjacentElement(`afterBegin`, guessContainer)
+    selector.insertAdjacentElement(`afterBegin`, guessContainer);
     selector.insertAdjacentElement(`afterBegin`, hangmanContainer);
     guessContainer.insertAdjacentElement(`afterBegin`, inputContainer)
     guessContainer.insertAdjacentElement(`afterBegin`, wordContainer);
+    guessContainer.insertAdjacentElement(`afterBegin`, guessedLetterContainer)
     guessContainer.insertAdjacentElement(`afterBegin`, headlineContainer)
 
     //Hangman SVG-object
@@ -54,6 +59,10 @@ document.addEventListener(`DOMContentLoaded`, () => {
     guess.classList.add(`guess-input`);
     guess.placeholder = "Make a guess";
 
+    //Guesed letters
+    let letters = [];
+    letters.id = `guessed-letters`
+
     //Submit button
     const submit = document.createElement(`button`);
     submit.innerText = `Guess`;
@@ -62,7 +71,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
     submit.style.maxWidth = `fit-content`;
 
     //Headline
-    const headline = document.createElement(`h1`);
+    let headline = document.createElement(`h1`);
     headline.style.fontFamily = "Verdana";
     headline.innerText = `Hangman`;
     headline.classList.add(`headline`);
@@ -82,7 +91,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
     selector.style.alignItems = `center`;
     selector.style.flexDirection = `column`;
 
-    //Add elements to guess-container;
+    //Add elements to containers;
     inputContainer.insertAdjacentElement(`afterBegin`, form);
     form.insertAdjacentElement(`afterBegin`, submit);
     form.insertAdjacentElement(`afterBegin`, guess);
@@ -110,7 +119,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
         document.addEventListener(`submit`, (event) => {
             event.preventDefault();
-
             let guessedLetter = document.querySelector(`#guess-input`).value.toUpperCase();
 
             //Correctly guessed letter
@@ -123,15 +131,20 @@ document.addEventListener(`DOMContentLoaded`, () => {
                 });
 
                 word.innerText = finalWord.join(``);
+                if(checkCompletion(word.innerText)){
+                    document.querySelector(`.headline`).innerText = `Congratulations, you won!`
+                }
             }
             //Incorrectly guessed letter
             else if (!secretWord.includes(guessedLetter)) {
                 triesLeft--;
-                console.log(triesLeft);
                 updateHangman(triesLeft);
+                letters.push(guessedLetter);
+                fillGuessedLetters(guessedLetter);
+                if(triesLeft === 0){
+                    document.querySelector(`.headline`).innerText = `Game over :( The stickman is hanging...`
+                }
             }
-
-            console.log(guessedLetter);
             form.reset();
         })
 
@@ -154,6 +167,18 @@ document.addEventListener(`DOMContentLoaded`, () => {
             }
         }
         return result;
+    }
+
+    function checkCompletion(string){
+        if(string.includes(`_`)){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function fillGuessedLetters(letter){
+        guessedLetterContainer.insertAdjacentHTML(`beforeend`, `<span> ${letter} </span>`);
     }
 
     function updateHangman(triesLeft) {
